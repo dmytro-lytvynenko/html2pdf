@@ -3,10 +3,6 @@
 #include <boost/beast.hpp>
 #include <boost/asio.hpp>
 
-namespace http = boost::beast::http;
-using tcp = boost::asio::ip::tcp;
-
-
 class Process
 {
 public:
@@ -17,12 +13,12 @@ public:
 
     ~Process();
 private:
-    //I/O контекст, необходимый для всех I/O операций
+    //I/O context necessary for all I/O operations
     boost::asio::io_context ioc;
-    // Tcp сокет, использующейся для соединения
-    tcp::socket socket;
-    // Resolver для определения endpoint'ов
-    tcp::resolver resolver;
+    // Tcp soket used for connection
+    boost::asio::ip::tcp::socket socket;
+    // Resolver for defenitions of endpoints
+    boost::asio::ip::tcp::resolver resolver;
     
     std::ofstream out;
     std::string host;
