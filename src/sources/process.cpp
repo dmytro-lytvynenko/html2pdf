@@ -1,42 +1,37 @@
 #include <process.hpp>
+#include <iostream>
 
-Process::Process(const std::string & address, const std::string & action) 
-            : resolver(ioc), socket(ioc)
+Process::Process(const std::string & address, const std::string & action)
             {
-                out.open("localversion.html");
-
+                out.open("learncpp.html");
                 host = address;
                 target = action;
             }
 
-void Process::send()
-{
-    // Resolve address and create connection
-    boost::asio::connect(socket, resolver.resolve(host, "80"));
-
-    // Then create http request
-    boost::beast::http::request<boost::beast::http::string_body> req(boost::beast::http::verb::get, target, 11);
-    // HTTP header fields
-    req.set(boost::beast::http::field::host, host);
-    req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-    
-    // Send request
-    boost::beast::http::write(socket, req);
+size_t Process::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp){
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
 }
 
-void Process::read()
+void Process::Send()
 {
-    boost::beast::flat_buffer buffer;
-    boost::beast::http::response<boost::beast::http::dynamic_body> res;
-    boost::beast::http::read(socket, buffer, res);
-    
-    // write correct response to local file
-    out << boost::beast::buffers_to_string(res.body().data()) << std::endl;
+    CURL* curl;
+    CURLcode response;
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, (host+target).c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GetResponsetoString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str_response);
+    response = curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
 }
+
+void Process::Read()
+{
+    out << str_response << std::endl;
+}
+
 
 Process::~Process()
 {
-    // Close connection
-    socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     out.close();
 }

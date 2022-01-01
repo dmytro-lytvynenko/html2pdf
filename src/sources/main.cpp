@@ -2,10 +2,10 @@
 
 int main() 
 {   
-    Process getHtml("www.example.com", "/echo?input=test");
+    Process GetHtml("https://www.learncpp.com", "/");
 
-    getHtml.send();
-    getHtml.read();
+    GetHtml.Send();
+    GetHtml.Read();
 
     return 0;
 }
