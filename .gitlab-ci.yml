@@ -13,6 +13,7 @@ build:
         cd ..
         git clone https://github.com/google/googletest
         apt update
+        apt install cmake
         apt install curl
         cd $CWD
       fi
