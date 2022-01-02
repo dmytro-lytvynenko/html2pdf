@@ -13,12 +13,9 @@ build:
         cd ..
         git clone https://github.com/google/googletest
         apt update
-        apt-get install libcurl4-gnutls-dev
-        Y
-        apt-get install libcurl4-openssl-dev
-        Y
-        apt-get install libcurl4-nss-dev
-        Y
+        apt install libcurl4-gnutls-dev
+        apt install libcurl4-openssl-dev
+        apt install libcurl4-nss-dev
         cd $CWD
       fi
 
