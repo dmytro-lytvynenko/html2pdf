@@ -13,9 +13,9 @@ build:
         cd ..
         git clone https://github.com/google/googletest
         apt update
-        apt-get install sudo
-        sudo apt-get install cmake
-        sudo apt-get install curl
+        apt-get install -y sudo
+        sudo apt-get install -y cmake
+        sudo apt-get install -y curl
         cd $CWD
       fi
 
