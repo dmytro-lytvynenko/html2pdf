@@ -12,9 +12,13 @@ build:
         CWD=`pwd`
         cd ..
         git clone https://github.com/google/googletest
+        apt update
+        apt-get install -y cmake
+        apt-get install -y curl
         cd $CWD
       fi
 
   script:
+    - cmake .
     - make
 
