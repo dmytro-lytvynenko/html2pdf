@@ -1,7 +1,5 @@
 #pragma once
-#define CURL_STATICLIB
 #include <fstream>
-#include <curl/curl.h>
 
 
 class Process
@@ -16,9 +14,9 @@ public:
     ~Process();
 private:
     static size_t GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp);
-    std::ofstream out;
-    std::string str_response;
-    std::string host;
-    std::string target;
-    size_t answer;
+    std::ofstream out_;
+    std::string str_response_;
+    std::string host_;
+    std::string target_;
+    size_t answer_;
 };

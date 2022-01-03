@@ -1,11 +1,13 @@
+#define CURL_STATICLIB
+#include <curl/curl.h>
 #include <process.hpp>
 #include <iostream>
 
 Process::Process(const std::string & address, const std::string & action)
             {
-                out.open("learncpp.html");
-                host = address;
-                target = action;
+                out_.open("learncpp.html");
+                host_ = address;
+                target_ = action;
             }
 
 size_t Process::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp){
@@ -18,20 +20,20 @@ void Process::Send()
     CURL* curl;
     CURLcode response;
     curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, (host+target).c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, (host_+target_).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GetResponsetoString);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str_response);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str_response_);
     response = curl_easy_perform(curl);
     curl_easy_cleanup(curl);
 }
 
 void Process::Read()
 {
-    out << str_response << std::endl;
+    out_ << str_response_ << std::endl;
 }
 
 
 Process::~Process()
 {
-    out.close();
+    out_.close();
 }
