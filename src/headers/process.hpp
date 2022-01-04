@@ -1,4 +1,7 @@
 #pragma once
+#define CURL_STATICLIB
+#include <curl/curl.h>
+#include <iostream>
 #include <fstream>
 
 
@@ -10,7 +13,6 @@ public:
     void Send();
     void Read();
     
-
     ~Process();
 private:
     static size_t GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp);
