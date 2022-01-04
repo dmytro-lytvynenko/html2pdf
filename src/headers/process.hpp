@@ -1,9 +1,6 @@
 #pragma once
-#define CURL_STATICLIB
-#include <curl/curl.h>
 #include <iostream>
 #include <fstream>
-
 
 class Process
 {
@@ -12,6 +9,11 @@ public:
     
     void Send();
     void Read();
+
+    void ChangeFirstLink();
+    void EraseTag(std::string tag);
+
+    void SetTarget(const std::string & target);
     
     ~Process();
 private:
