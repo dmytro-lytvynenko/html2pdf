@@ -2,6 +2,7 @@ image: gcc
 
 stages:          # List of stages for jobs, and their order of execution
   - build
+  - static-code-analysis
 
 build:
   stage: build
@@ -12,13 +13,21 @@ build:
         CWD=`pwd`
         cd ..
         git clone https://github.com/google/googletest
-        apt update
-        apt-get install -y cmake
-        apt-get install -y curl
         cd $CWD
       fi
+    - |
+      apt update                
+      apt-get install -y cmake  
+      apt-get install -y curl   
+    - |
+      cppcheck --version
 
   script:
     - cmake .
     - make
 
+cppcheck:
+  stage: static-code-analysis
+
+  script:
+    - cppcheck src/ --verbose --enable=all
