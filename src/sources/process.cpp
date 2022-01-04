@@ -1,42 +1,36 @@
 #include <process.hpp>
 
-Process::Process(const std::string & address, const std::string & action) 
-            : resolver(ioc), socket(ioc)
+Process::Process(const std::string & address, const std::string & action)
             {
-                out.open("localversion.html");
-
-                host = address;
-                target = action;
+                out_.open("learncpp.html");
+                host_ = address;
+                target_ = action;
             }
 
-void Process::send()
+size_t Process::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
 {
-    // Resolve address and create connection
-    boost::asio::connect(socket, resolver.resolve(host, "80"));
-
-    // Then create http request
-    boost::beast::http::request<boost::beast::http::string_body> req(boost::beast::http::verb::get, target, 11);
-    // HTTP header fields
-    req.set(boost::beast::http::field::host, host);
-    req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-    
-    // Send request
-    boost::beast::http::write(socket, req);
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
 }
 
-void Process::read()
+void Process::Send()
 {
-    boost::beast::flat_buffer buffer;
-    boost::beast::http::response<boost::beast::http::dynamic_body> res;
-    boost::beast::http::read(socket, buffer, res);
-    
-    // write correct response to local file
-    out << boost::beast::buffers_to_string(res.body().data()) << std::endl;
+    CURL* curl;
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, (host_+target_).c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GetResponsetoString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str_response_);
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
 }
+
+void Process::Read()
+{
+    out_ << str_response_ << std::endl;
+}
+
 
 Process::~Process()
 {
-    // Close connection
-    socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    out.close();
+    out_.close();
 }
