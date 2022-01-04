@@ -1,5 +1,21 @@
 image: gcc
 
+before_script:
+  - |
+    if [ ! -d ../googletest ]; then
+      CWD=`pwd`
+      cd ..
+      git clone https://github.com/google/googletest
+      cd $CWD
+    fi
+  - |
+    apt update  
+    apt-get install -y cmake
+    apt-get install -y curl
+    apt-get install -y cppcheck
+  - |
+    cppcheck --version
+
 stages:          # List of stages for jobs, and their order of execution
   - build
   - static-code-analysis
@@ -7,27 +23,11 @@ stages:          # List of stages for jobs, and their order of execution
 build:
   stage: build
 
-  before_script:
-    - |
-      if [ ! -d ../googletest ]; then
-        CWD=`pwd`
-        cd ..
-        git clone https://github.com/google/googletest
-        cd $CWD
-      fi
-    - |
-      apt update  
-      apt-get install -y cmake
-      apt-get install -y curl
-      apt-get install -y cppcheck
-    - |
-      cppcheck --version
-
   script:
     - cmake .
     - make
 
-cppcheck:
+static-code-analysis:
   stage: static-code-analysis
 
   script:
