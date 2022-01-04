@@ -16,9 +16,10 @@ build:
         cd $CWD
       fi
     - |
-      apt update                
-      apt-get install -y cmake  
-      apt-get install -y curl   
+      apt update  
+      apt-get install -y cmake
+      apt-get install -y curl
+      apt-get install -y cppcheck
     - |
       cppcheck --version
 
