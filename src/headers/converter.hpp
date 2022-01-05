@@ -1,6 +1,6 @@
 
-#ifndef _CONVERTER_
-#define _CONVERTER_
+#ifndef CONVERTER_H_
+#define CONVERTER_H_
 
 #include <fstream>
 
@@ -10,31 +10,25 @@
 #include <setjmp.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
 extern "C"
 {
 #include "hpdf.h"
 }
+extern jmp_buf env;
 
 class Converter
 {
 public:
-        Converter(const std::string &address, const std::string &action);
+        Converter(const std::string &source_filename) : source_filename_(source_filename){};
 
-        void render();
+        void Render();
 
-        ~Converter();
+        ~Converter(){};
 
 private:
-        // I/O context necessary for all I/O operations
-        boost::asio::io_context ioc;
-        // Tcp soket used for connection
-        boost::asio::ip::tcp::socket socket;
-        // Resolver for defenitions of endpoints
-        boost::asio::ip::tcp::resolver resolver;
-
-        std::ofstream out;
-        std::string host;
-        std::string target;
+        std::string source_filename_;
+        const std::string output_filename_ = "converted.pdf";
 };
 
 #endif
