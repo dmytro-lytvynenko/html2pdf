@@ -1,0 +1,5 @@
+*.pdf
+converter
+.vscode
+build/*
+*.html

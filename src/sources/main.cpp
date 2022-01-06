@@ -1,4 +1,5 @@
 #include <process.hpp>
+#include "converter.hpp"
 
 int main() 
 {   
@@ -13,6 +14,16 @@ int main()
     GetHtml.ChangeFirstLink();
 
     GetHtml.Read();
+
+    Converter converter("../Docs/ulinks");
+    try
+    {
+        converter.Render();
+    }
+    catch (...)
+    {
+        return 1;
+    }
 
     return 0;
 }
