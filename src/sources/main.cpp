@@ -1,12 +1,19 @@
 #include <process.hpp>
 #include "converter.hpp"
 
-int main()
-{
-    Process getHtml("www.example.com", "/echo?input=test");
+int main() 
+{   
+    Process GetHtml("https://www.learncpp.com", "/");
 
-    getHtml.send();
-    getHtml.read();
+    GetHtml.Send();
+
+    GetHtml.SetTarget("/cpp-tutorial/introduction-to-these-tutorials/");
+
+    GetHtml.Send();
+
+    GetHtml.ChangeFirstLink();
+
+    GetHtml.Read();
 
     Converter converter("../Docs/ulinks");
     try
@@ -20,3 +27,5 @@ int main()
 
     return 0;
 }
+
+//include curl to process.cpp

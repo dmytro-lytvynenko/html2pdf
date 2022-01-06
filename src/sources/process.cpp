@@ -1,42 +1,69 @@
 #include <process.hpp>
+#define CURL_STATICLIB
+#include <curl/curl.h>
 
-Process::Process(const std::string & address, const std::string & action) 
-            : resolver(ioc), socket(ioc)
-            {
-                out.open("localversion.html");
-
-                host = address;
-                target = action;
-            }
-
-void Process::send()
+Process::Process(const std::string & address, const std::string & action)
 {
-    // Resolve address and create connection
-    boost::asio::connect(socket, resolver.resolve(host, "80"));
-
-    // Then create http request
-    boost::beast::http::request<boost::beast::http::string_body> req(boost::beast::http::verb::get, target, 11);
-    // HTTP header fields
-    req.set(boost::beast::http::field::host, host);
-    req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-    
-    // Send request
-    boost::beast::http::write(socket, req);
+    out_.open("learncpp.html");
+    host_ = address;
+    target_ = action;
 }
 
-void Process::read()
+void Process::SetTarget(const std::string & target)
 {
-    boost::beast::flat_buffer buffer;
-    boost::beast::http::response<boost::beast::http::dynamic_body> res;
-    boost::beast::http::read(socket, buffer, res);
-    
-    // write correct response to local file
-    out << boost::beast::buffers_to_string(res.body().data()) << std::endl;
+    target_=target;
 }
+
+void Process::ChangeFirstLink(){
+    int i=str_response_.find(host_+target_);
+    str_response_.replace(i,(host_+target_).size(),"#first_link");
+
+    i=str_response_.find("0.1 — Introduction to these tutorials</h1>");
+    str_response_.insert(--i," id=\"first_link\"");
+
+    EraseTag("base");
+
+}
+
+void Process::EraseTag(std::string tag){
+    tag='<'+tag;
+    while(str_response_.find(tag)!=std::string::npos)
+    {
+    int begin=str_response_.find(tag);
+    int end=begin;
+    while(str_response_[end]!='>')
+    {
+        end++;
+    }
+    str_response_.erase(begin,end-begin+1);
+    }
+}
+
+
+size_t Process::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
+{
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
+
+void Process::Send()
+{
+    CURL* curl;
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, (host_+target_).c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GetResponsetoString);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str_response_);
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+}
+
+void Process::Read()
+{
+    out_ << str_response_ << std::endl;
+}
+
 
 Process::~Process()
 {
-    // Close connection
-    socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-    out.close();
+    out_.close();
 }

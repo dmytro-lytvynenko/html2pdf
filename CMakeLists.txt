@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.14)
 project(html2pdf)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CURL_LIBRARY "-lcurl") 
 
-find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+find_package(CURL REQUIRED) 
 
 # fetching and building LibHaru
 include(ExternalProject)
@@ -18,7 +18,6 @@ ExternalProject_Add(
 
 set(LIBHARU_STATIC_LIB "${CMAKE_BINARY_DIR}/lib/libhpdfs.a")
 set(LIBHARU_INCLUDES "${CMAKE_BINARY_DIR}/include")
-
 # 
 
 add_executable(html2pdf src/sources/main.cpp)
@@ -26,7 +25,7 @@ add_library(process src/sources/process.cpp)
 add_library(converter src/sources/converter.cpp)
 
 target_include_directories(html2pdf PUBLIC src/headers/ )
-target_include_directories(process PUBLIC src/headers/ )
+target_include_directories(process PUBLIC src/headers/ ${CURL_INCLUDE_DIR})
 target_include_directories(converter PUBLIC src/headers/ ${LIBHARU_INCLUDES})
 
-target_link_libraries(html2pdf converter ${Boost_LIBRARIES} process ${LIBHARU_STATIC_LIB} pthread z)
+target_link_libraries(html2pdf converter ${CURL_LIBRARIES} process ${LIBHARU_STATIC_LIB} z)
