@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.14)
 project(html2pdf)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CURL_LIBRARY "-lcurl") 
 
 find_package(CURL REQUIRED) 
 
@@ -24,8 +23,14 @@ add_executable(html2pdf src/sources/main.cpp)
 add_library(process src/sources/process.cpp)
 add_library(converter src/sources/converter.cpp)
 
+# not sure that is needed
+add_dependencies(html2pdf libharu) 
+####
+
+add_dependencies(converter libharu)
+
 target_include_directories(html2pdf PUBLIC src/headers/ )
 target_include_directories(process PUBLIC src/headers/ ${CURL_INCLUDE_DIR})
 target_include_directories(converter PUBLIC src/headers/ ${LIBHARU_INCLUDES})
 
-target_link_libraries(html2pdf converter ${CURL_LIBRARIES} process ${LIBHARU_STATIC_LIB} z)
+target_link_libraries(html2pdf converter ${CURL_LIBRARIES} process ${LIBHARU_STATIC_LIB} z curl)

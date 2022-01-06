@@ -24,7 +24,9 @@ build:
   stage: build
 
   script:
-    - cmake .
+    - mkdir build
+    - cmake -S . -B build
+    - cd build
     - make
 
 static-code-analysis:

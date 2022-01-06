@@ -43,33 +43,33 @@ void PrintText(HPDF_Page index_page, HPDF_Font font, std::string text, int x_pos
 };
 
 // ;(
-void PrintLink(HPDF_Page index_page,
-               HPDF_Font font,
-               HPDF_Point tp,
-               HPDF_Rect rect,
-               std::string text,
-               std::string link)
-{
-        /* Create Link-Annotation object on index page. */
-        HPDF_Page_BeginText(index_page);
-        HPDF_Page_SetFontAndSize(index_page, font, 8);
-        HPDF_Page_MoveTextPos(index_page, 15, 180);
-        HPDF_Page_SetTextLeading(index_page, 23);
+// void PrintLink(HPDF_Page index_page,
+//                HPDF_Font font,
+//                HPDF_Point tp,
+//                HPDF_Rect rect,
+//                std::string text,
+//                std::string link)
+// {
+//         /* Create Link-Annotation object on index page. */
+//         HPDF_Page_BeginText(index_page);
+//         HPDF_Page_SetFontAndSize(index_page, font, 8);
+//         HPDF_Page_MoveTextPos(index_page, 15, 180);
+//         HPDF_Page_SetTextLeading(index_page, 23);
 
-        /* URI link */
-        tp = HPDF_Page_GetCurrentTextPos(index_page);
+//         /* URI link */
+//         tp = HPDF_Page_GetCurrentTextPos(index_page);
 
-        HPDF_Page_ShowText(index_page, text.c_str());
+//         HPDF_Page_ShowText(index_page, text.c_str());
 
-        rect.left = tp.x - 4;
-        rect.bottom = tp.y - 4;
-        rect.right = HPDF_Page_GetCurrentTextPos(index_page).x + 4;
-        rect.top = tp.y + 10;
+//         rect.left = tp.x - 4;
+//         rect.bottom = tp.y - 4;
+//         rect.right = HPDF_Page_GetCurrentTextPos(index_page).x + 4;
+//         rect.top = tp.y + 10;
 
-        HPDF_Page_CreateURILinkAnnot(index_page, rect, link.c_str());
+//         HPDF_Page_CreateURILinkAnnot(index_page, rect, link.c_str());
 
-        HPDF_Page_EndText(index_page);
-};
+//         HPDF_Page_EndText(index_page);
+// };
 
 void Converter::Render()
 {
@@ -99,7 +99,6 @@ void Converter::Render()
         {
                 std::cerr << "cannot create PdfDoc object" << std::endl;
                 throw "cannot create PdfDoc object";
-                return;
         }
 
         if (setjmp(env))
@@ -134,8 +133,8 @@ void Converter::Render()
         HPDF_Page_SetHeight(index_page, (lines.size() + 2) * 15);
 
         // print lines in pdf
-        for (int i = 0; i < lines.size() - 1; i++)
-                PrintText(index_page, font, lines[i].c_str(), 15, 100 - (i * 10));
+        for (int index = 0; index < lines.size() - 1; index++)
+                PrintText(index_page, font, lines[index].c_str(), 15, 100 - (index * 10));
 
         // PrintLink(index_page, font, tp, rect, "sdqqvdsv", "sdvdsv");
 
