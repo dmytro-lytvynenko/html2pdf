@@ -1,7 +1,53 @@
 #!/bin/bash
 
+DeleteTmpBildFolders() {
+
+if [ -d build ]; then
+      rm -rf build
+fi
+if [ -d builds ]; then
+      rm -rf builds
+fi
+
+}
+
+DeleteHtml2pdfFiles() {
+
+if [ -f html2pdf ]; then
+      rm -f html2pdf
+fi
+
+if [ -f learncpp.html ]; then
+      rm -f learncpp.html
+fi
+
+}
+
+PreviousCommandExitCodeCheck() {
+
+if [ $? -ne 0 ]; then
+  echo -e "Failure: execute previous command\n" >&2
+  exit 1
+fi
+
+}
+
+DeleteTmpBildFolders
+DeleteHtml2pdfFiles
+
+
 mkdir build
 cmake -S . -B build
 cd build
 make
+
+PreviousCommandExitCodeCheck
+
 cd ..
+
+
+if [ -f build/html2pdf ]; then
+      cp build/html2pdf .
+fi
+
+DeleteTmpBildFolders
