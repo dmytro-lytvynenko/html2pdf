@@ -9,6 +9,7 @@ before_script:
       cd $CWD
     fi
   - |
+    apt update
     apt-get install -y bash
     apt-get install -y cmake
     apt-get install -y curl
