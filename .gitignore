@@ -4,3 +4,4 @@ converter
 build/*
 builds/*
 *.html
+html2pdf
