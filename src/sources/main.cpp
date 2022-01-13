@@ -1,19 +1,21 @@
 #include <process.hpp>
+#include <sys/stat.h>
 #include "converter.hpp"
 
 int main() 
 {   
-    Process GetHtml("https://www.learncpp.com", "/");
+    mkdir("project",0777);
+    mkdir("project/html",0777);
+    Process MainHtml("learncpp", "https://www.learncpp.com", "/");
 
-    GetHtml.Send();
+    MainHtml.Send();
 
-    GetHtml.SetTarget("/cpp-tutorial/introduction-to-these-tutorials/");
+    MainHtml.FindLinks(5);
+    MainHtml.ChangeLink(5);
 
-    GetHtml.Send();
+    MainHtml.Read();
 
-    GetHtml.ChangeFirstLink();
-
-    GetHtml.Read();
+    MainHtml.CreateSubPage(5);
 
     Converter converter("../Docs/ulinks");
     try
