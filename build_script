@@ -1,5 +1,12 @@
 #!/bin/bash
 
+[ -z $BASH ] || shopt -s expand_aliases
+alias BEGINCOMMENT="if [ ]; then"
+alias ENDCOMMENT="fi"
+
+#BEGINCOMMENT
+#ENDCOMMENT
+
 DeleteTmpBildFolders() {
 
 if [ -d build ]; then
@@ -19,6 +26,10 @@ fi
 
 if [ -f learncpp.html ]; then
       rm -f learncpp.html
+fi
+
+if [ -d html2pdf ]; then
+      rm -rf html2pdf
 fi
 
 }
@@ -45,9 +56,10 @@ PreviousCommandExitCodeCheck
 
 cd ..
 
-
 if [ -f build/html2pdf ]; then
-      cp build/html2pdf .
+      mkdir html2pdf
+      cp build/html2pdf html2pdf/
 fi
 
 DeleteTmpBildFolders
+
