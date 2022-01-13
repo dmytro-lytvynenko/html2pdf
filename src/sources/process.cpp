@@ -4,15 +4,15 @@
 
 Process::Process(const std::string & fileName, const std::string & address, const std::string & action)
 {
-    out_.open("project/html/"+fileName+".html");
+    filename_ = fileName;
     host_ = address;
     target_ = action;
 }
 
-void Process::SetTarget(const std::string & target)
-{
-    target_=target;
-}
+// void Process::SetTarget(const std::string & target)
+// {
+//     target_=target;
+// }
 
 void Process::FindLinks(const int & idx) {
     int i=0;
@@ -25,28 +25,28 @@ void Process::FindLinks(const int & idx) {
 
         int begin = curr;
 
-
         int end = str_response_.find("\"",curr);
 
         link = GetString(begin,end);
-        
-        links_.push_back(link);
+
+        links_to_titles_[link] = "";
 
         i++;
     }
 
 }
 
-std::string Process::GetTitle(const int & idx) {
-    return titles_[idx];
-}
+// std::string Process::GetTitle(const int & idx) {
+//     return titles_[idx];
+// }
 
-std::string Process::GetLink(const int & idx) {
-    return links_[idx];
-}
+// std::string Process::GetLink(const int & idx) {
+//     return links_[idx];
+// }
 
 void Process::ChangeLink(const int & idx){
     int i=0;
+    auto it = links_to_titles_.begin();
     int curr=0;
     std::string link;
     while (i!=idx) {
@@ -61,52 +61,53 @@ void Process::ChangeLink(const int & idx){
         curr = str_response_.find("/",++curr);
 
         link = GetString(++curr,end);
-        titles_.push_back(link);
+
+        it->second = link;
 
         str_response_.replace(begin,end-begin+1,link+".html");
 
         i++;
+        it++;
     }
 
     EraseTag("base");
-
 }
 
 std::string Process::GetString(int begin, const int & end){
     std::string str;
     while (begin!=end)
-    str+=str_response_[begin++];
+        str+=str_response_[begin++];
+
     return str;
 }
 
-
-
 void Process::CreateSubPage(const int & idx){
     int i=0;
+    auto it = links_to_titles_.begin();
     while (i!=idx){
-        Process SubPage(titles_[i],host_,links_[i]);
+        Process SubPage(it->first,host_,it->second);
         
         SubPage.Send();
         SubPage.Read();
+
         i++;
+        it++;
     }
 }
-
 
 void Process::EraseTag(std::string tag){
     tag='<'+tag;
     while(str_response_.find(tag)!=std::string::npos)
     {
-    int begin=str_response_.find(tag);
-    int end=begin;
-    while(str_response_[end]!='>')
-    {
-        end++;
-    }
-    str_response_.erase(begin,end-begin+1);
+        int begin=str_response_.find(tag);
+        int end=begin;
+        while(str_response_[end]!='>')
+        {
+            end++;
+        }
+        str_response_.erase(begin,end-begin+1);
     }
 }
-
 
 size_t Process::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
 {
@@ -127,11 +128,23 @@ void Process::Send()
 
 void Process::Read()
 {
-    out_ << str_response_ << std::endl;
-}
+    try
+    {
+        out_.open("project/html/"+filename_+".html");
+        
+        try
+        {
+            out_ << str_response_ << std::endl;
+        }
+        catch(...)
+        {
+            std::cout << "Failed writing to html file" << std::endl;
+        }
 
-
-Process::~Process()
-{
-    out_.close();
+        out_.close();
+    }
+    catch(...)
+    {
+        std::cout << "Failed work with html files" << std::endl;
+    }
 }
