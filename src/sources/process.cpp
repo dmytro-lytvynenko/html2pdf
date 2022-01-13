@@ -85,7 +85,7 @@ void Process::CreateSubPage(const int & idx){
     int i=0;
     auto it = links_to_titles_.begin();
     while (i!=idx){
-        Process SubPage(it->first,host_,it->second);
+        Process SubPage(it->second,host_,it->first);
         
         SubPage.Send();
         SubPage.Read();
