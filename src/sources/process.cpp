@@ -2,9 +2,9 @@
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
-Process::Process(const std::string & address, const std::string & action)
+Process::Process(const std::string & fileName, const std::string & address, const std::string & action)
 {
-    out_.open("learncpp.html");
+    out_.open("project/html/"+fileName+".html");
     host_ = address;
     target_ = action;
 }
@@ -14,16 +14,84 @@ void Process::SetTarget(const std::string & target)
     target_=target;
 }
 
-void Process::ChangeFirstLink(){
-    int i=str_response_.find(host_+target_);
-    str_response_.replace(i,(host_+target_).size(),"#first_link");
+void Process::FindLinks(const int & idx) {
+    int i=0;
+    int curr=0;
+    std::string link;
+    while (i!=idx) {
+        curr = str_response_.find("<div class=\"lessontable-row-title\">",curr);
+        curr = str_response_.find("www",++curr);
+        curr = str_response_.find("/",++curr);
 
-    i=str_response_.find("0.1 — Introduction to these tutorials</h1>");
-    str_response_.insert(--i," id=\"first_link\"");
+        int begin = curr;
+
+
+        int end = str_response_.find("\"",curr);
+
+        link = GetString(begin,end);
+        
+        links_.push_back(link);
+
+        i++;
+    }
+
+}
+
+std::string Process::GetTitle(const int & idx) {
+    return titles_[idx];
+}
+
+std::string Process::GetLink(const int & idx) {
+    return links_[idx];
+}
+
+void Process::ChangeLink(const int & idx){
+    int i=0;
+    int curr=0;
+    std::string link;
+    while (i!=idx) {
+        curr = str_response_.find("<div class=\"lessontable-row-title\">",curr);
+        curr = str_response_.find("https",++curr);
+
+        int begin = curr;
+        int end = str_response_.find("\"",begin) - 1;
+
+        curr = str_response_.find("www", curr);
+        curr = str_response_.find("/",++curr);
+        curr = str_response_.find("/",++curr);
+
+        link = GetString(++curr,end);
+        titles_.push_back(link);
+
+        str_response_.replace(begin,end-begin+1,link+".html");
+
+        i++;
+    }
 
     EraseTag("base");
 
 }
+
+std::string Process::GetString(int begin, const int & end){
+    std::string str;
+    while (begin!=end)
+    str+=str_response_[begin++];
+    return str;
+}
+
+
+
+void Process::CreateSubPage(const int & idx){
+    int i=0;
+    while (i!=idx){
+        Process SubPage(titles_[i],host_,links_[i]);
+        
+        SubPage.Send();
+        SubPage.Read();
+        i++;
+    }
+}
+
 
 void Process::EraseTag(std::string tag){
     tag='<'+tag;
