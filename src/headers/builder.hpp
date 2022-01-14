@@ -10,7 +10,7 @@
 class Builder {
   /*      Hardcode!     */
   std::string template_file_name_ = "../learncpp.template";
-  std::string source_file_name_ = "learncpp.html";
+  std::string source_file_name_ = "project/html/learncpp.html";
   std::string FileToString(std::ifstream &file_stream);
 
  public:
