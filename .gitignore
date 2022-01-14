@@ -2,4 +2,6 @@
 converter
 .vscode
 build/*
+builds/*
 *.html
+html2pdf
