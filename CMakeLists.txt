@@ -20,7 +20,7 @@ set(LIBHARU_INCLUDES "${CMAKE_BINARY_DIR}/include")
 # 
 
 add_executable(html2pdf src/sources/main.cpp)
-add_library(process src/sources/process.cpp)
+add_library(get_html src/sources/get_html.cpp)
 add_library(converter src/sources/converter.cpp)
 add_library(builder src/sources/builder/builder.cc src/sources/builder/pdf_link_obj.cc src/sources/builder/pdf_text_obj.cc)
 
@@ -31,8 +31,8 @@ add_dependencies(html2pdf libharu)
 add_dependencies(converter libharu)
 
 target_include_directories(html2pdf PUBLIC src/headers/ )
-target_include_directories(process PUBLIC src/headers/ ${CURL_INCLUDE_DIR})
+target_include_directories(get_html PUBLIC src/headers/ ${CURL_INCLUDE_DIR})
 target_include_directories(converter PUBLIC src/headers/ ${LIBHARU_INCLUDES})
 target_include_directories(builder PUBLIC src/headers/ ${LIBHARU_INCLUDES})
 
-target_link_libraries(html2pdf converter builder ${CURL_LIBRARIES} process ${LIBHARU_STATIC_LIB} z curl)
+target_link_libraries(html2pdf converter builder ${CURL_LIBRARIES} get_html ${LIBHARU_STATIC_LIB} z curl)

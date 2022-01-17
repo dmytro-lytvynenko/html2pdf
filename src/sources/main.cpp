@@ -1,4 +1,4 @@
-#include <process.hpp>
+#include <get_html.hpp>
 #include <sys/stat.h>
 
 #include "builder.hpp"
@@ -7,14 +7,14 @@
 int main() {
     mkdir("project",0777);
     mkdir("project/html",0777);
-    Process MainHtml("learncpp", "https://www.learncpp.com", "/");
+    GetHtml MainHtml("learncpp", "https://www.learncpp.com", "/");
 
-    MainHtml.Send();
+    MainHtml.SendRequestAndGetResponse();
 
     MainHtml.FindLinks(5);
     MainHtml.ChangeLink(5);
 
-    MainHtml.Read();
+    MainHtml.WriteResponseToFile();
 
     MainHtml.CreateSubPage(5);
 
