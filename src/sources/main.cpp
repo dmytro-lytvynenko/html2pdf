@@ -1,9 +1,10 @@
 #include <get_html.hpp>
 #include <sys/stat.h>
+
+#include "builder.hpp"
 #include "converter.hpp"
 
-int main() 
-{   
+int main() {
     mkdir("project",0777);
     mkdir("project/html",0777);
     GetHtml MainHtml("learncpp", "https://www.learncpp.com", "/");
@@ -17,17 +18,23 @@ int main()
 
     MainHtml.CreateSubPage(5);
 
-    Converter converter("../Docs/ulinks");
-    try
-    {
-        converter.Render();
-    }
-    catch (...)
-    {
-        return 1;
-    }
 
-    return 0;
+  Builder builder;
+  std::vector<PdfObject *> obj_tree;
+  try {
+    obj_tree = builder.BuildTree();
+  } catch (...) {
+    return 1;
+  }
+
+  Converter converter("../Docs/ulinks", obj_tree);
+  try {
+    converter.Render();
+  } catch (...) {
+    return 1;
+  }
+
+  return 0;
 }
 
-//include curl to process.cpp
+// include curl to process.cpp

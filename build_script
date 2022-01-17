@@ -1,11 +1,15 @@
 #!/bin/bash
 
+#MultiLineBashCommenter() {
+
 [ -z $BASH ] || shopt -s expand_aliases
 alias BEGINCOMMENT="if [ ]; then"
 alias ENDCOMMENT="fi"
 
 #BEGINCOMMENT
 #ENDCOMMENT
+
+#}
 
 DeleteTmpBildFolders() {
 
@@ -54,6 +58,7 @@ make
 
 PreviousCommandExitCodeCheck
 
+
 cd ..
 
 if [ -f build/html2pdf ]; then
@@ -62,4 +67,3 @@ if [ -f build/html2pdf ]; then
 fi
 
 DeleteTmpBildFolders
-
