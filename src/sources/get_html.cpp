@@ -1,24 +1,20 @@
-#include <process.hpp>
+#include <get_html.hpp>
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
-Process::Process(const std::string & fileName, const std::string & address, const std::string & action)
+GetHtml::GetHtml(const std::string & filename, const std::string & address, 
+                 const std::string & action)
 {
-    filename_ = fileName;
+    filename_ = filename;
     host_ = address;
     target_ = action;
 }
 
-// void Process::SetTarget(const std::string & target)
-// {
-//     target_=target;
-// }
-
-void Process::FindLinks(const int & idx) {
-    int i=0;
-    int curr=0;
+void GetHtml::FindLinks(const int & links_number) {
+    int curr = 0;
+    int count=0;
     std::string link;
-    while (i!=idx) {
+    while (count!=links_number) {
         curr = str_response_.find("<div class=\"lessontable-row-title\">",curr);
         curr = str_response_.find("www",++curr);
         curr = str_response_.find("/",++curr);
@@ -31,25 +27,16 @@ void Process::FindLinks(const int & idx) {
 
         links_to_titles_[link] = "";
 
-        i++;
+        count++;
     }
-
 }
 
-// std::string Process::GetTitle(const int & idx) {
-//     return titles_[idx];
-// }
-
-// std::string Process::GetLink(const int & idx) {
-//     return links_[idx];
-// }
-
-void Process::ChangeLink(const int & idx){
-    int i=0;
+void GetHtml::ChangeLink(const int & links_number){
     auto it = links_to_titles_.begin();
-    int curr=0;
+    int curr = 0;
+    int count=0;
     std::string link;
-    while (i!=idx) {
+    while (count!=links_number) {
         curr = str_response_.find("<div class=\"lessontable-row-title\">",curr);
         curr = str_response_.find("https",++curr);
 
@@ -66,36 +53,42 @@ void Process::ChangeLink(const int & idx){
 
         str_response_.replace(begin,end-begin+1,link+".html");
 
-        i++;
+        count++;
         it++;
     }
-
+    
     EraseTag("base");
 }
 
-std::string Process::GetString(int begin, const int & end){
-    std::string str;
-    while (begin!=end)
-        str+=str_response_[begin++];
-
-    return str;
+std::string GetHtml::GetString(int & begin, const int & end) const
+{ 
+    try
+    {
+        return str_response_.substr(begin, end - begin);
+    }
+    catch(...)
+    {
+        std::cout << "Error while getting link or title! " 
+                  << "Response emptyness = " << str_response_.empty() << std::endl; 
+        return "";
+    }
 }
 
-void Process::CreateSubPage(const int & idx){
-    int i=0;
+void GetHtml::CreateSubPage(const int & subpages_number){
+    int count=0;
     auto it = links_to_titles_.begin();
-    while (i!=idx){
-        Process SubPage(it->second,host_,it->first);
-        
-        SubPage.Send();
-        SubPage.Read();
+    while (count!=subpages_number){
+        GetHtml SubPage(it->second,host_,it->first);
 
-        i++;
+        SubPage.SendRequestAndGetResponse();
+        SubPage.WriteResponseToFile();
+
+        count++;
         it++;
     }
 }
 
-void Process::EraseTag(std::string tag){
+void GetHtml::EraseTag(std::string tag){
     tag='<'+tag;
     while(str_response_.find(tag)!=std::string::npos)
     {
@@ -109,39 +102,38 @@ void Process::EraseTag(std::string tag){
     }
 }
 
-size_t Process::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
+size_t GetHtml::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
 {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
-void Process::Send()
+void GetHtml::SendRequestAndGetResponse()
 {
-    CURL* curl;
-    curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, (host_+target_).c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GetResponsetoString);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &str_response_);
-    curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
+    CURL* descriptor = curl_easy_init();
+    curl_easy_setopt(descriptor, CURLOPT_URL, (host_+target_).c_str());
+    curl_easy_setopt(descriptor, CURLOPT_WRITEFUNCTION, GetResponsetoString);
+    curl_easy_setopt(descriptor, CURLOPT_WRITEDATA, &str_response_);
+    curl_easy_perform(descriptor);
+    curl_easy_cleanup(descriptor);
 }
 
-void Process::Read()
+void GetHtml::WriteResponseToFile()
 {
     try
     {
-        out_.open("project/html/"+filename_+".html");
+        output_stream_.open("project/html/"+filename_+".html");
         
         try
         {
-            out_ << str_response_ << std::endl;
+            output_stream_ << str_response_ << std::endl;
         }
         catch(...)
         {
             std::cout << "Failed writing to html file" << std::endl;
         }
 
-        out_.close();
+        output_stream_.close();
     }
     catch(...)
     {
