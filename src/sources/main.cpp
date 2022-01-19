@@ -1,33 +1,33 @@
-#include <get_html.hpp>
 #include <sys/stat.h>
 
-#include "builder.hpp"
+#include <get_html.hpp>
+
 #include "converter.hpp"
+#include "tree_builder.hpp"
 
 int main() {
-    mkdir("project",0777);
-    mkdir("project/html",0777);
-    GetHtml MainHtml("learncpp", "https://www.learncpp.com", "/");
+  mkdir("project", 0777);
+  mkdir("project/html", 0777);
+  GetHtml MainHtml("learncpp", "https://www.learncpp.com", "/");
 
-    MainHtml.SendRequestAndGetResponse();
+  MainHtml.SendRequestAndGetResponse();
 
-    MainHtml.FindLinks(5);
-    MainHtml.ChangeLink(5);
+  MainHtml.FindLinks(5);
+  MainHtml.ChangeLink(5);
 
-    MainHtml.WriteResponseToFile();
+  MainHtml.WriteResponseToFile();
 
-    MainHtml.CreateSubPage(5);
+  MainHtml.CreateSubPage(5);
 
-
-  Builder builder;
-  std::vector<PdfObject *> obj_tree;
+  PDF::TreeBuilder TreeBuilder;
+  std::vector<PDF::TreeNode *> obj_tree;
   try {
-    obj_tree = builder.BuildTree();
+    obj_tree = TreeBuilder.BuildTree();
   } catch (...) {
     return 1;
   }
 
-  Converter converter("../Docs/ulinks", obj_tree);
+  PDF::Converter converter("./project/html/learncpp.html", obj_tree);
   try {
     converter.Render();
   } catch (...) {

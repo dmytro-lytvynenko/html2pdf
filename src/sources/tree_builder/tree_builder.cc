@@ -1,4 +1,4 @@
-#include "builder.hpp"
+#include "tree_builder.hpp"
 
 #include <cmath>
 #include <exception>
@@ -6,37 +6,11 @@
 #include <iostream>
 #include <limits>
 
-#include "pdf_link_obj.hpp"
-#include "pdf_text_obj.hpp"
+#include "pdf_helper.hpp"
+#include "tree_link_node.hpp"
+#include "tree_text_node.hpp"
 
-std::string Builder::FileToString(std::ifstream &file_stream) {
-  char ch;
-  std::string str;
-
-  while (true) {
-    file_stream.get(ch);
-    if (file_stream.eof()) break;
-    if (ch == '\t') continue;
-    str.push_back(ch);
-  }
-
-  return str;
-};
-
-std::vector<int> getAllIndexes(const std::string &str,
-                               const std::string &sub_str) {
-  std::vector<int> idxs;
-  if (str.empty()) return idxs;
-  idxs.clear();
-
-  size_t idx = 0;
-
-  while ((idx = str.find(sub_str, idx)) != std::string::npos)
-    idxs.push_back(idx), ++idx;
-
-  return idxs;
-}
-
+namespace PDF_helper {
 void DeletTagsExceptLinks(std::string &str) {
   std::string new_string;
 
@@ -63,31 +37,30 @@ void DeletTagsExceptLinks(std::string &str) {
     new_string.push_back(str[i]);
   }
   str = new_string;
-};
+}
+}  // namespace PDF_helper
 
-std::vector<PdfObject *> Builder::BuildTree() {
+namespace PDF {
+
+std::vector<TreeNode *> TreeBuilder::BuildTree() {
   std::string source_file_;
   std::string template_file_;
-
   // buffering source file
   std::ifstream source_in(source_file_name_);
   if (!source_in.is_open()) {
     std::cerr << "Source file do not exists" << std::endl;
     throw "Source file do not exists";
   }
-  source_file_ = FileToString(source_in);
+  source_file_ = PDF_helper::FileToString(source_in);
   source_in.close();
-
   // buffering template file
   std::ifstream template_in(template_file_name_);
   if (!template_in.is_open()) {
     std::cerr << "Template file do not exists" << std::endl;
     throw "Template file do not exists";
   }
-  template_file_ = FileToString(template_in);
+  template_file_ = PDF_helper::FileToString(template_in);
   template_in.close();
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   std::string start_substring;
   std::string end_substring;
@@ -106,13 +79,12 @@ std::vector<PdfObject *> Builder::BuildTree() {
   std::string template_end =
       template_file_.substr(content_word_end + 1, template_file_.size() - 1);
 
-  std::vector<int> start_indexes = getAllIndexes(source_file_, template_start);
-  std::vector<int> end_indexes = getAllIndexes(source_file_, template_end);
+  std::vector<int> start_indexes =
+      PDF_helper::getAllIndexes(source_file_, template_start);
+  std::vector<int> end_indexes =
+      PDF_helper::getAllIndexes(source_file_, template_end);
 
-  std::vector<PdfObject *> obj_tree;
-  ///////////////
-  //  std::cout << start_indexes.size() << " " << end_indexes.size() <<
-  //  std::endl;
+  std::vector<TreeNode *> obj_tree;
   long long content_word_argument = std::numeric_limits<long long>::max();
   if ((content_word_end - content_word_start) > 10) {
     content_word_argument = std::stoi(template_file_.substr(
@@ -124,7 +96,7 @@ std::vector<PdfObject *> Builder::BuildTree() {
     std::string substr = source_file_.substr(start_indexes[i],
                                              end_indexes[i] - start_indexes[i]);
 
-    DeletTagsExceptLinks(substr);
+    PDF_helper::DeletTagsExceptLinks(substr);
 
     std::string text_buffer, link_buffer;
     int last_start = 0;
@@ -133,17 +105,18 @@ std::vector<PdfObject *> Builder::BuildTree() {
       if (substr[i] == '<' && !is_link) {
         is_link = 1;
         obj_tree.push_back(
-            new PdfTextObj(substr.substr(last_start, i - last_start)));
+            new TreeTextNode(substr.substr(last_start, i - last_start)));
         last_start = i;
       }
       if (substr[i] == '>' && substr[i - 1] == 'a' && is_link) {
         is_link = 0;
         obj_tree.push_back(
-            new PdfLinkObj(substr.substr(last_start, i + 1 - last_start)));
+            new TreeLinkNode(substr.substr(last_start, i + 1 - last_start)));
         last_start = i + 1;
       }
     }
   }
-  //////////
   return obj_tree;
-};
+}
+
+}  // namespace PDF

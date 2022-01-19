@@ -1,9 +1,11 @@
-#include "pdf_text_obj.hpp"
+#include "tree_text_node.hpp"
 
 #include <algorithm>
 #include <iostream>
 
-void PdfTextObj::Render(Writer &writer) {
+namespace PDF {
+
+void TreeTextNode::Render(Writer &writer) {
   std::string buffer = text_;
   char sep = '\n';
   std::vector<std::string> lines;
@@ -16,4 +18,6 @@ void PdfTextObj::Render(Writer &writer) {
     std::replace(it.begin(), it.end(), '\0', ' ');
     writer.PrintLine(it);
   }
-};
+}
+
+}  // namespace PDF

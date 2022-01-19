@@ -11,17 +11,19 @@
 #include <iostream>
 #include <vector>
 
-#include "pdf_link_obj.hpp"
-#include "pdf_text_obj.hpp"
+#include "tree_link_node.hpp"
+#include "tree_text_node.hpp"
 extern "C" {
 #include "hpdf.h"
 }
+
+namespace PDF {
 extern jmp_buf env;
 
 class Converter {
  public:
   Converter(const std::string &source_filename,
-            std::vector<PdfObject *> obj_tree);
+            std::vector<TreeNode *> obj_tree);
 
   void Render();
 
@@ -29,9 +31,11 @@ class Converter {
 
  private:
   int max_y_, max_x_;
-  std::vector<PdfObject *> obj_tree_;
+  std::vector<TreeNode *> obj_tree_;
   std::string source_filename_;
-  const std::string output_filename_ = "converted.pdf";
+  const std::string output_filename_ = "./project/converted.pdf";
 };
+
+}  // namespace PDF
 
 #endif
