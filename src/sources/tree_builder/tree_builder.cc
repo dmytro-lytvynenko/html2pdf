@@ -62,8 +62,6 @@ std::vector<TreeNode *> TreeBuilder::BuildTree() {
   template_file_ = PDF_helper::FileToString(template_in);
   template_in.close();
 
-  std::string start_substring;
-  std::string end_substring;
   int content_word_start, content_word_end;
   if (((content_word_start = template_file_.find("\%content")) ==
        std::string::npos) ||
@@ -85,34 +83,35 @@ std::vector<TreeNode *> TreeBuilder::BuildTree() {
       PDF_helper::getAllIndexes(source_file_, template_end);
 
   std::vector<TreeNode *> obj_tree;
-  long long content_word_argument = std::numeric_limits<long long>::max();
+  long long content_word_argument;
   if ((content_word_end - content_word_start) > 10) {
     content_word_argument = std::stoi(template_file_.substr(
         content_word_start + 9, content_word_end - content_word_start - 10));
   } else {
     content_word_argument = std::min(start_indexes.size(), end_indexes.size());
   }
+  // content_word_argument = std::numeric_limits<long long>::max();
+
   for (int i = 0; i < content_word_argument; i++) {
     std::string substr = source_file_.substr(start_indexes[i],
                                              end_indexes[i] - start_indexes[i]);
 
     PDF_helper::DeletTagsExceptLinks(substr);
 
-    std::string text_buffer, link_buffer;
     int last_start = 0;
     bool is_link = 0;
-    for (int i = 0, size = substr.size(); i < size; i++) {
-      if (substr[i] == '<' && !is_link) {
+    for (int j = 0, size = substr.size(); j < size; j++) {
+      if (substr[j] == '<' && !is_link) {
         is_link = 1;
         obj_tree.push_back(
-            new TreeTextNode(substr.substr(last_start, i - last_start)));
-        last_start = i;
+            new TreeTextNode(substr.substr(last_start, j - last_start)));
+        last_start = j;
       }
-      if (substr[i] == '>' && substr[i - 1] == 'a' && is_link) {
+      if (substr[j] == '>' && substr[j - 1] == 'a' && is_link) {
         is_link = 0;
         obj_tree.push_back(
-            new TreeLinkNode(substr.substr(last_start, i + 1 - last_start)));
-        last_start = i + 1;
+            new TreeLinkNode(substr.substr(last_start, j + 1 - last_start)));
+        last_start = j + 1;
       }
     }
   }
