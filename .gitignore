@@ -1,7 +1,8 @@
 *.pdf
 converter
 .vscode
-build/*
-builds/*
+build
+builds
 *.html
 html2pdf
+project

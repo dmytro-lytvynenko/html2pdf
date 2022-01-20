@@ -1,14 +1,17 @@
 #include "converter.hpp"
 
+#include "pdf_helper.hpp"
+
+namespace PDF {
+
 jmp_buf env;
 
-/* From builder.cc */
-std::vector<int> getAllIndexes(const std::string &str,
-                               const std::string &sub_str);
-//
+/*--------------------------------*/
+constexpr int page_width = (150) * 6;
+/*--------------------------------*/
 
 Converter::Converter(const std::string &source_filename,
-                     std::vector<PdfObject *> obj_tree)
+                     std::vector<TreeNode *> obj_tree)
     : source_filename_(source_filename), obj_tree_(obj_tree){};
 
 void error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
@@ -18,30 +21,15 @@ void error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
   longjmp(env, 1);
 }
 
-std::string FileToString(std::ifstream &file_stream) {
-  char ch;
-  std::string str;
-
-  while (true) {
-    file_stream.get(ch);
-    if (file_stream.eof()) break;
-    // if (ch == '\n')
-    //         ch = ' ';
-    str.append(1, ch);
-  }
-
-  return str;
-};
-
 void Converter::Render() {
   std::ifstream in(source_filename_);
   if (!in.is_open()) {
-    std::cerr << "File do not exists" << std::endl;
-    throw "File do not exists";
+    std::cerr << "Input HTML file do not exists" << std::endl;
+    throw "Input HTML file do not exists";
   }
   // Open an input file
 
-  std::string buffer = FileToString(in);
+  std::string buffer = PDF_helper::FileToString(in);
 
   in.close();
 
@@ -86,8 +74,8 @@ void Converter::Render() {
 
   /* create index page */
   index_page = HPDF_AddPage(pdf);
-  HPDF_Page_SetWidth(index_page, (150) * 6);
-  HPDF_Page_SetHeight(index_page, (700) * 15);
+  HPDF_Page_SetWidth(index_page, page_width);
+  HPDF_Page_SetHeight(index_page, PDF_helper::page_height);
 
   Writer writer;
   writer.index_page = index_page;
@@ -106,3 +94,5 @@ void Converter::Render() {
   /* clean up */
   HPDF_Free(pdf);
 }
+
+}  // namespace PDF
