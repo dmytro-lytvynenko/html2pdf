@@ -19,11 +19,11 @@ set(LIBHARU_STATIC_LIB "${CMAKE_BINARY_DIR}/lib/libhpdfs.a")
 set(LIBHARU_INCLUDES "${CMAKE_BINARY_DIR}/include")
 # 
 
-add_executable(html2pdf src/sources/main.cpp)
-add_library(get_html src/sources/get_html.cpp)
-add_library(converter src/sources/converter.cpp)
-add_library(TreeBuilder src/sources/tree_builder/tree_builder.cc src/sources/tree_builder/tree_link_node.cc src/sources/tree_builder/tree_text_node.cc)
-add_library(PDF_helper src/sources/pdf_helper.cc )
+add_executable(html2pdf src/main.cpp)
+add_library(get_html src/html/sources/get_html.cpp)
+add_library(converter src/pdf/sources/converter.cpp)
+add_library(TreeBuilder src/pdf/tree_builder/sources/tree_builder.cc src/pdf/tree_builder/sources/tree_link_node.cc src/pdf/tree_builder/sources/tree_text_node.cc)
+add_library(PDF_helper src/pdf/sources/pdf_helper.cc )
 
 # not sure that is needed
 add_dependencies(html2pdf libharu) 
@@ -31,10 +31,10 @@ add_dependencies(html2pdf libharu)
 
 add_dependencies(converter libharu)
 
-target_include_directories(html2pdf PUBLIC src/headers/ )
-target_include_directories(get_html PUBLIC src/headers/ ${CURL_INCLUDE_DIR})
-target_include_directories(converter PUBLIC src/headers/ ${LIBHARU_INCLUDES})
-target_include_directories(TreeBuilder PUBLIC src/headers/ ${LIBHARU_INCLUDES})
-target_include_directories(PDF_helper PUBLIC src/headers/ )
+target_include_directories(html2pdf PUBLIC src/html/headers/ src/pdf/headers/ src/pdf/tree_builder/headers/)
+target_include_directories(get_html PUBLIC src/html/headers/ ${CURL_INCLUDE_DIR})
+target_include_directories(converter PUBLIC src/pdf/headers/ src/pdf/tree_builder/headers/ ${LIBHARU_INCLUDES})
+target_include_directories(TreeBuilder PUBLIC src/pdf/tree_builder/headers/ src/pdf/headers/ ${LIBHARU_INCLUDES})
+target_include_directories(PDF_helper PUBLIC src/pdf/headers/ )
 
 target_link_libraries(html2pdf converter TreeBuilder ${CURL_LIBRARIES} get_html ${LIBHARU_STATIC_LIB} z curl PDF_helper)
