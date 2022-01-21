@@ -1,23 +1,27 @@
 #include <sys/stat.h>
 
-#include <get_html.hpp>
-
+#include "get_html.hpp"
+#include "html_parser.hpp"
 #include "converter.hpp"
 #include "tree_builder.hpp"
 
-int main() {
-  mkdir("project", 0777);
-  mkdir("project/html", 0777);
-  GetHtml MainHtml("learncpp", "https://www.learncpp.com", "/");
+
+int main(){
+  mkdir("project",0777);
+  mkdir("project/html",0777);
+  Html::GetHtml MainHtml("learncpp", "https://www.learncpp.com", "/");
 
   MainHtml.SendRequestAndGetResponse();
 
-  MainHtml.FindLinks(5);
-  MainHtml.ChangeLink(5);
+  Html::HtmlParser ParseMainHtml(MainHtml);
+
+  ParseMainHtml.FindLinks(5);
+  ParseMainHtml.ChangeLink(5);
 
   MainHtml.WriteResponseToFile();
 
   MainHtml.CreateSubPage(5);
+
 
   PDF::TreeBuilder TreeBuilder;
   std::vector<PDF::TreeNode *> obj_tree;
