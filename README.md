@@ -27,11 +27,12 @@ html2pdf should get the table of contents from the [https://www.learncpp.com/](h
 
 To build the project on a local Ubuntu run `build_script` on the root directory of the project:
 
-`$ sudo ./build_script`
+`$ sudo ./build_script.sh`
 
 After the successful project's build, run on the root directory of the project:
 
-`$./html2pdf`
+`$ cd html2pdf/`
+`$ ./html2pdf`
 
 ### On a docker container
 
@@ -53,8 +54,9 @@ In other linux terminal run next command from the root of the project:
 
 In the container terminal run command:
 
-`# sudo ./build_script`
+`# sudo ./build_script.sh`
 
 Run html2pdf
 
+`# cd html2pdf/`
 `# ./html2pdf`
