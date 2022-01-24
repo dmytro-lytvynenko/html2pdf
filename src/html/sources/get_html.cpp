@@ -1,8 +1,8 @@
-#include <get_html.hpp>
+#include "get_html.hpp"
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
-GetHtml::GetHtml(const std::string & filename, const std::string & address, 
+Html::GetHtml::GetHtml(const std::string & filename, const std::string & address, 
                  const std::string & action)
 {
     filename_ = filename;
@@ -10,71 +10,40 @@ GetHtml::GetHtml(const std::string & filename, const std::string & address,
     target_ = action;
 }
 
-void GetHtml::FindLinks(const int & links_number) {
-    int curr = 0;
-    int count=0;
-    std::string link;
-    while (count!=links_number) {
-        curr = str_response_.find("<div class=\"lessontable-row-title\">",curr);
-        curr = str_response_.find("www",++curr);
-        curr = str_response_.find("/",++curr);
+Html::GetHtml::GetHtml(const GetHtml& source_html)
+    : filename_(source_html.filename_), host_(source_html.host_), target_(source_html.target_),
+     str_response_(source_html.str_response_)
+{ }
 
-        int begin = curr;
+Html::GetHtml& Html::GetHtml::operator=(const GetHtml& source_html)
+{
+  if (this == &source_html) return *this;
 
-        int end = str_response_.find("\"",curr);
+  this->filename_ = source_html.filename_;
+  this->host_= source_html.host_;
+  this->target_ = source_html.target_;
+  this->str_response_ = source_html.str_response_;
 
-        link = GetString(begin,end);
-
-        links_to_titles_[link] = "";
-
-        count++;
-    }
+  return *this;
 }
 
-void GetHtml::ChangeLink(const int & links_number){
-    auto it = links_to_titles_.begin();
-    int curr = 0;
-    int count=0;
-    std::string link;
-    while (count!=links_number) {
-        curr = str_response_.find("<div class=\"lessontable-row-title\">",curr);
-        curr = str_response_.find("https",++curr);
-
-        int begin = curr;
-        int end = str_response_.find("\"",begin) - 1;
-
-        curr = str_response_.find("www", curr);
-        curr = str_response_.find("/",++curr);
-        curr = str_response_.find("/",++curr);
-
-        link = GetString(++curr,end);
-
-        it->second = link;
-
-        str_response_.replace(begin,end-begin+1,link+".html");
-
-        count++;
-        it++;
-    }
-    
-    EraseTag("base");
+std::string& Html::GetHtml::GetStrResponse()
+{
+    return str_response_;
 }
 
-std::string GetHtml::GetString(int & begin, const int & end) const
-{ 
-    try
-    {
-        return str_response_.substr(begin, end - begin);
-    }
-    catch(...)
-    {
-        std::cout << "Error while getting link or title! " 
-                  << "Response emptyness = " << str_response_.empty() << std::endl; 
-        return "";
-    }
+std::map<std::string, std::string>& Html::GetHtml::GetLinksToTitles()
+{
+    return links_to_titles_;
 }
 
-void GetHtml::CreateSubPage(const int & subpages_number){
+size_t Html::GetHtml::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
+{
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
+
+void Html::GetHtml::CreateSubPage(const int & subpages_number) const{
     int count=0;
     auto it = links_to_titles_.begin();
     while (count!=subpages_number){
@@ -88,37 +57,18 @@ void GetHtml::CreateSubPage(const int & subpages_number){
     }
 }
 
-void GetHtml::EraseTag(std::string tag){
-    tag='<'+tag;
-    while(str_response_.find(tag)!=std::string::npos)
-    {
-        int begin=str_response_.find(tag);
-        int end=begin;
-        while(str_response_[end]!='>')
-        {
-            end++;
-        }
-        str_response_.erase(begin,end-begin+1);
-    }
-}
-
-size_t GetHtml::GetResponsetoString(void* contents, size_t size, size_t nmemb, void* userp)
+void Html::GetHtml::SendRequestAndGetResponse()
 {
-    ((std::string*)userp)->append((char*)contents, size * nmemb);
-    return size * nmemb;
-}
-
-void GetHtml::SendRequestAndGetResponse()
-{
-    CURL* descriptor = curl_easy_init();
+    CURL* descriptor;
+    descriptor = curl_easy_init();
     curl_easy_setopt(descriptor, CURLOPT_URL, (host_+target_).c_str());
     curl_easy_setopt(descriptor, CURLOPT_WRITEFUNCTION, GetResponsetoString);
-    curl_easy_setopt(descriptor, CURLOPT_WRITEDATA, &str_response_);
+    curl_easy_setopt(descriptor, CURLOPT_WRITEDATA, &str_response_);   
     curl_easy_perform(descriptor);
     curl_easy_cleanup(descriptor);
 }
 
-void GetHtml::WriteResponseToFile()
+void Html::GetHtml::WriteResponseToFile()
 {
     try
     {

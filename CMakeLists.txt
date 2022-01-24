@@ -21,6 +21,7 @@ set(LIBHARU_INCLUDES "${CMAKE_BINARY_DIR}/include")
 
 add_executable(html2pdf src/main.cpp)
 add_library(get_html src/html/sources/get_html.cpp)
+add_library(parser src/html/sources/html_parser.cpp)
 add_library(converter src/pdf/sources/converter.cpp)
 add_library(TreeBuilder src/pdf/tree_builder/sources/tree_builder.cc src/pdf/tree_builder/sources/tree_link_node.cc src/pdf/tree_builder/sources/tree_text_node.cc)
 add_library(PDF_helper src/pdf/sources/pdf_helper.cc )
@@ -33,8 +34,9 @@ add_dependencies(converter libharu)
 
 target_include_directories(html2pdf PUBLIC src/html/headers/ src/pdf/headers/ src/pdf/tree_builder/headers/)
 target_include_directories(get_html PUBLIC src/html/headers/ ${CURL_INCLUDE_DIR})
+target_include_directories(parser PUBLIC src/html/headers/ ${CURL_INCLUDE_DIR})
 target_include_directories(converter PUBLIC src/pdf/headers/ src/pdf/tree_builder/headers/ ${LIBHARU_INCLUDES})
 target_include_directories(TreeBuilder PUBLIC src/pdf/tree_builder/headers/ src/pdf/headers/ ${LIBHARU_INCLUDES})
 target_include_directories(PDF_helper PUBLIC src/pdf/headers/ )
 
-target_link_libraries(html2pdf converter TreeBuilder ${CURL_LIBRARIES} get_html ${LIBHARU_STATIC_LIB} z curl PDF_helper)
+target_link_libraries(html2pdf converter TreeBuilder ${CURL_LIBRARIES} get_html parser ${LIBHARU_STATIC_LIB} z curl PDF_helper)
