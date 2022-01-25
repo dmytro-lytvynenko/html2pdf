@@ -39,5 +39,5 @@ For detailed information, we can consult the [Puppeteer API](https://github.com/
 Let’s try it out:
 
 ```
-$ node myScreenshot.js
+$ node get-pdf.js
 ```
