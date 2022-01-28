@@ -75,6 +75,7 @@ cd ..
 if [ -f build/html2pdf ]; then
       mkdir html2pdf
       cp build/html2pdf html2pdf/
+      cp src/pdf/templates/learncpp.template html2pdf/
 fi
 
 CheckNotDelBuildCommandLineArgument $1
