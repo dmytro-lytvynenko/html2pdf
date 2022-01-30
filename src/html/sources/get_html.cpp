@@ -2,6 +2,7 @@
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
+
 Html::GetHtml::GetHtml(const std::string & filename, const std::string & address, 
                  const std::string & action)
 {
@@ -32,7 +33,7 @@ std::string& Html::GetHtml::GetStrResponse()
     return str_response_;
 }
 
-std::map<std::string, std::string>& Html::GetHtml::GetLinksToTitles()
+std::vector <std::pair<std::string, std::string>>& Html::GetHtml::GetLinksToTitles()
 {
     return links_to_titles_;
 }
@@ -45,7 +46,7 @@ size_t Html::GetHtml::GetResponsetoString(void* contents, size_t size, size_t nm
 
 void Html::GetHtml::CreateSubPage(const int & subpages_number) const{
     int count=0;
-    auto it = links_to_titles_.begin();
+    auto it = links_to_titles_.cbegin();
     while (count!=subpages_number){
         GetHtml SubPage(it->second,host_,it->first);
 
@@ -72,7 +73,7 @@ void Html::GetHtml::WriteResponseToFile()
 {
     try
     {
-        output_stream_.open("project/html/"+filename_+".html");
+        output_stream_.open(Html::Web::PATH+filename_+Html::Web::EXTEN);
         
         try
         {

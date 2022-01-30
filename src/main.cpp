@@ -15,12 +15,12 @@ int main(){
 
   Html::HtmlParser ParseMainHtml(MainHtml);
 
-  ParseMainHtml.FindLinks(5);
-  ParseMainHtml.ChangeLink(5);
+  ParseMainHtml.FindLinks(296);
+  ParseMainHtml.ChangeLink(296);
 
   MainHtml.WriteResponseToFile();
 
-  MainHtml.CreateSubPage(5);
+  MainHtml.CreateSubPage(296);
 
 
   PDF::TreeBuilder TreeBuilder;

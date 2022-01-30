@@ -1,5 +1,6 @@
 #include "html_parser.hpp"
 
+
 Html::HtmlParser::HtmlParser(Html::GetHtml & html_page)
 { 
     html_page_ = &html_page;
@@ -10,17 +11,17 @@ void Html::HtmlParser::FindLinks(const int & links_number) {
     int count=0;
     std::string link;
     while (count!=links_number) {
-        curr = html_page_->GetStrResponse().find("<div class=\"lessontable-row-title\">",curr);
-        curr = html_page_->GetStrResponse().find("www",++curr);
-        curr = html_page_->GetStrResponse().find("/",++curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::TARGET,curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::WWW,++curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::SLASH,++curr);
 
         int begin = curr;
 
-        int end = html_page_->GetStrResponse().find("\"",curr);
+        int end = html_page_->GetStrResponse().find(Html::Web::QUOT,curr);
 
         link = GetString(begin,end);
 
-        html_page_->GetLinksToTitles().insert(std::pair<std::string, std::string>(link, ""));
+        html_page_->GetLinksToTitles().push_back(std::pair<std::string, std::string>(link, ""));
 
         count++;
     }
@@ -32,21 +33,21 @@ void Html::HtmlParser::ChangeLink(const int & links_number){
     int count=0;
     std::string link;
     while (count!=links_number) {
-        curr = html_page_->GetStrResponse().find("<div class=\"lessontable-row-title\">",curr);
-        curr = html_page_->GetStrResponse().find("https",++curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::TARGET,curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::PROTOCOL,++curr);
         
         int begin = curr;
-        int end = html_page_->GetStrResponse().find("\"",begin) - 1;
+        int end = html_page_->GetStrResponse().find(Html::Web::QUOT,begin) - 1;
 
-        curr = html_page_->GetStrResponse().find("www", curr);
-        curr = html_page_->GetStrResponse().find("/",++curr);
-        curr = html_page_->GetStrResponse().find("/",++curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::WWW, curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::SLASH,++curr);
+        curr = html_page_->GetStrResponse().find(Html::Web::SLASH,++curr);
 
         link = GetString(++curr,end);
 
         it->second = link;
 
-        html_page_->GetStrResponse().replace(begin,end-begin+1,link+".html");
+        html_page_->GetStrResponse().replace(begin,end-begin+1,link+Html::Web::EXTEN);
 
         count++;
         it++;

@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
-#include <map>
+#include <vector>
 
 namespace Html
 {
@@ -19,7 +19,7 @@ namespace Html
 
     std::string& GetStrResponse();
     
-    std::map<std::string, std::string>& GetLinksToTitles();
+    std::vector <std::pair<std::string, std::string>>& GetLinksToTitles();
 
     void CreateSubPage(const int & subpages_number) const;
 
@@ -31,6 +31,20 @@ namespace Html
     std::string str_response_;
     std::string host_;
     std::string target_;
-    std::map<std::string, std::string> links_to_titles_;
+    std::vector <std::pair<std::string, std::string>> links_to_titles_;
+   // static const std::string WWW;
+   // static const std::string TARGET;
     };
+
+
+    namespace Web {
+        static const std::string WWW = "www";
+        static const std::string TARGET = "<div class=\"lessontable-row-title\">";
+        static const std::string PROTOCOL = "https";
+        static const std::string SLASH = "/";
+        static const std::string BSLASH = "\\";
+        static const std::string QUOT = "\"";
+        static const std::string EXTEN = ".html";
+        static const std::string PATH = "project/html/";
+    }
 }
